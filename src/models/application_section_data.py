@@ -2,8 +2,9 @@ import uuid
 from typing import Any
 
 from sqlalchemy import ForeignKey, Index, String, UniqueConstraint
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.types import JSON
 
 from src.core.database import Base
 
@@ -23,6 +24,6 @@ class ApplicationSectionData(Base):
         nullable=False,
     )
     section_id: Mapped[str] = mapped_column(String(128), nullable=False)
-    data: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
+    data: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
 
     application = relationship("Application", back_populates="section_data")

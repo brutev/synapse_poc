@@ -1,17 +1,13 @@
-class ServerException implements Exception {
-  const ServerException(this.message);
+import 'app_exception.dart';
 
-  final String message;
+class ServerException extends AppException {
+  const ServerException(super.message);
 }
 
-class NetworkException implements Exception {
-  const NetworkException(this.message);
-
-  final String message;
+class NetworkException extends AppException {
+  const NetworkException(super.message);
 }
 
-class UnknownException implements Exception {
-  const UnknownException(this.message);
-
-  final String message;
+class CacheException extends AppException {
+  const CacheException(super.message);
 }

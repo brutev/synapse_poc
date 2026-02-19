@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import FastAPI
 
 from src.core.config import get_settings
@@ -6,6 +8,13 @@ from src.routers.applications import router as applications_router
 from src.routers.evaluate import router as evaluate_router
 from src.routers.save_draft import router as save_draft_router
 from src.routers.submit import router as submit_router
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 settings = get_settings()
 
@@ -16,3 +25,5 @@ app.include_router(evaluate_router)
 app.include_router(action_router)
 app.include_router(save_draft_router)
 app.include_router(submit_router)
+
+logger.info(f"✅ {settings.app_name} started")

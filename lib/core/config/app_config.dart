@@ -1,6 +1,5 @@
 class AppConfig {
-  static const String baseUrl = String.fromEnvironment(
-    'BASE_URL',
-    defaultValue: 'http://10.0.2.2:8000',
-  );
+  const AppConfig._();
+
+  static const String appName = 'ZIVA LOS';
 }

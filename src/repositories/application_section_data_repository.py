@@ -12,6 +12,11 @@ class ApplicationSectionDataRepository:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
+    @staticmethod
+    def _ensure_uuid(value: str | UUID) -> UUID:
+        """Convert string to UUID if needed."""
+        return UUID(value) if isinstance(value, str) else value
+
     async def get_by_application_id(self, application_id: UUID) -> list[ApplicationSectionData]:
         query = select(ApplicationSectionData).where(
             ApplicationSectionData.application_id == application_id,
@@ -21,11 +26,12 @@ class ApplicationSectionDataRepository:
 
     async def get_by_application_and_section(
         self,
-        application_id: UUID,
+        application_id: UUID | str,
         section_id: str,
     ) -> ApplicationSectionData | None:
+        app_id = self._ensure_uuid(application_id)
         query = select(ApplicationSectionData).where(
-            ApplicationSectionData.application_id == application_id,
+            ApplicationSectionData.application_id == app_id,
             ApplicationSectionData.section_id == section_id,
         )
         result = await self.session.execute(query)
@@ -33,14 +39,15 @@ class ApplicationSectionDataRepository:
 
     async def upsert(
         self,
-        application_id: UUID,
+        application_id: UUID | str,
         section_id: str,
         data: dict[str, Any],
     ) -> ApplicationSectionData:
-        existing = await self.get_by_application_and_section(application_id, section_id)
+        app_id = self._ensure_uuid(application_id)
+        existing = await self.get_by_application_and_section(app_id, section_id)
         if existing is None:
             entity = ApplicationSectionData(
-                application_id=application_id,
+                application_id=app_id,
                 section_id=section_id,
                 data=data,
             )
@@ -55,20 +62,21 @@ class ApplicationSectionDataRepository:
 
     async def merge_fields(
         self,
-        application_id: UUID,
+        application_id: UUID | str,
         section_id: str,
         updated_fields: dict[str, Any],
     ) -> ApplicationSectionData:
-        existing = await self.get_by_application_and_section(application_id, section_id)
+        app_id = self._ensure_uuid(application_id)
+        existing = await self.get_by_application_and_section(app_id, section_id)
         if existing is None:
             entity = ApplicationSectionData(
-                application_id=application_id,
+                application_id=app_id,
                 section_id=section_id,
                 data=updated_fields,
             )
             self.session.add(entity)
         else:
-            merged = dict(existing.data)
+            merged = dict(existing.data) if existing.data else {}
             merged.update(updated_fields)
             existing.data = merged
             entity = existing
